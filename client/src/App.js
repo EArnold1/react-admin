@@ -1,7 +1,8 @@
 import { Admin, Resource, fetchUtils } from 'react-admin';
 import { UserList, UserEdit } from './components/users';
 import { CreditList, CreditEdit } from './components/credit';
-import { TransactionsList } from './components/transactions';
+import { TransactionsList, TransactionEdit } from './components/transactions';
+import { WalletList, WalletEdit } from './components/wallet';
 import simpleRestProvider from 'ra-data-simple-rest';
 import authProvider from './authProvider';
 
@@ -20,7 +21,8 @@ const App = () => {
     <Admin dataProvider={restClient} authProvider={authProvider}>
       <Resource name="users" list={UserList} edit={UserEdit} />
       <Resource name="credit" list={CreditList} edit={CreditEdit} />
-      <Resource name="transactions" list={TransactionsList} />
+      <Resource name="transactions" list={TransactionsList} edit={TransactionEdit} />
+      <Resource name="wallet" list={WalletList} edit={WalletEdit} />
     </Admin>
   )
 }

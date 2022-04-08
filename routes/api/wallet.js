@@ -18,8 +18,10 @@ router.get('/', auth, async (req, res) => {
 
         const wallet = await Wallet.find({});
         wallet.forEach(data => {
-            walletStore.push({ id: data.id, bitcoin: data.bitcoin, usdt: data.usdt, ethreum: data.ethereum, bnb: data.bnb })
+            walletStore.push({ id: data.id, bitcoin: data.bitcoin, usdt: data.usdt, ethereum: data.ethereum, bnb: data.bnb })
         })
+        res.setHeader('Content-Range', 'bytes 0-10/100');
+
         res.json(walletStore)
 
     } catch (err) {

@@ -2,45 +2,39 @@ const express = require('express')
 const router = express.Router()
 const auth = require('../../middleware/auth');
 
-const Credit = require('../../models/Credit');
+const Transaction = require('../../models/Transaction');
 
 
 
 //@route  GET api/credit/transactions
 //@desc   Get transactions
 //access  Private
-router.get('/', async (req, res) => {
-    let banks = []
+router.get('/', auth, async (req, res) => {
+    let transactions = []
     try {
-        const credit = await Credit.find({}).sort({ date: -1 }).populate('userId', [
+
+        const trans = await Transaction.find({}).sort({ date: -1 }).populate('userId', [
             'firstname',
             'lastname',
             'email',
         ]);
 
-        credit.forEach((data) => {
-
-            data.transactions.forEach((val) => {
-
-                banks.push({
-                    amount: val.amount,
-                    status: val.status,
-                    plan: val.plan,
-                    id: val.id,
-                    currency: val.currency,
-                    transactionid: val.transactionId,
-                    date: val.date,
-                    userId: data.id,
-                    name: `${data.userId.firstname} ${data.userId.lastname}`,
-                    email: data.userId.email
-                })
-
+        trans.forEach((data) => {
+            transactions.push({
+                amount: data.amount,
+                status: data.status,
+                plan: data.plan,
+                id: data.id,
+                currency: data.currency,
+                transactionid: data.transactionId,
+                date: data.date,
+                name: `${data.userId.firstname} ${data.userId.lastname}`,
+                email: data.userId.email
             })
-
         })
 
         res.setHeader('Content-Range', 'bytes 0-10/100');
-        res.json(banks);
+        res.json(transactions);
     } catch (err) {
         console.log(err)
         res.status(500).json({ msg: 'Server Error' });
@@ -51,31 +45,26 @@ router.get('/', async (req, res) => {
 //@route  GET api/transactions/:id
 //@desc   Get transaction
 //access  Private
-router.get('/:userid/:id', auth, async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     let box = {};
     try {
-        let credit = await Credit.findOne({ _id: req.params.userid }).populate('userId', [
+        let trans = await Transaction.findOne({ _id: req.params.id }).populate('userId', [
             'firstname',
             'lastname',
             'email',
         ])
 
 
-        box.userId = credit.userId.id
-        box.name = `${credit.userId.firstname} ${credit.userId.lastname}`
-        box.email = credit.userId.email
-
-        credit = credit.transactions.filter(data => data.id === req.params.id)
-
-        credit.forEach((data) => {
-            box.id = data.id
-            box.amount = data.amount
-            box.status = data.status
-            box.currency = data.currency
-            box.plan = data.plan
-            box.type = data.type
-            box.date = data.date
-        })
+        box.userId = trans.userId.id
+        box.name = `${trans.userId.firstname} ${trans.userId.lastname}`
+        box.email = trans.userId.email
+        box.id = trans.id
+        box.amount = trans.amount
+        box.status = trans.status
+        box.currency = trans.currency
+        box.plan = trans.plan
+        box.type = trans.type
+        box.date = trans.date
 
         res.json(box)
     } catch (err) {
@@ -88,30 +77,37 @@ router.get('/:userid/:id', auth, async (req, res) => {
 //@route  PUT api/transactions/:userId/:id
 //@desc   Edit a transaction
 //access  Private
-router.put('/:userId/:id', auth, async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
 
-    const { status, amount } = req.body;
+    const { status } = req.body;
 
-    // const box = {};
+    const transactBox = {
+        status
+    };
+
+    const box = {}
 
     try {
 
-        let credit = await Credit.findOne({ _id: req.params.userId });
 
-        let transObj = credit.transactions
+        let trans = await Transaction.findOne({ _id: req.params.id });
 
-        const transUpdate = credit.transactions.forEach((t) => {
-            if (t.id === req.params.id) {
-                if (amount) t.amount = amount
-                if (status) t.status = status;
-                box = t
-            }
-        });
+        trans = await Transaction.findByIdAndUpdate(
+            trans._id,
+            { $set: transactBox },
+            { new: true }
+        );
 
+        box.status = trans.status
+        box.id = trans.id
+        box.amount = trans.amount
+        box.status = trans.status
+        box.currency = trans.currency
+        box.plan = trans.plan
+        box.type = trans.type
+        box.date = trans.date
 
-        await credit.save();
-
-        res.json(box)
+        res.json(box);
 
     } catch (err) {
         console.log(err)

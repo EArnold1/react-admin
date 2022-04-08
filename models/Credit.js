@@ -53,37 +53,6 @@ const CreditSchema = new mongoose.Schema({
             default: ''
         }
     },
-    transactions: [
-        {
-            amount: {
-                type: Number,
-                required: true,
-            },
-            date: {
-                type: Date,
-                default: Date.now,
-            },
-            status: {
-                type: String,
-                default: 'pending'
-            },
-            currency: {
-                type: String,
-                required: true
-            },
-            plan: {
-                type: String,
-            },
-            transactionId: {
-                type: String,
-                required: true
-            },
-            type: {
-                type: String,  // withdrawal or deposit
-                required: true,
-            },
-        },
-    ],
     date: {
         type: Date,
         default: Date.now,
