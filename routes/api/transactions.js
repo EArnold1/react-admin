@@ -9,7 +9,7 @@ const Credit = require('../../models/Credit');
 //@route  GET api/credit/transactions
 //@desc   Get transactions
 //access  Private
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
     let banks = []
     try {
         const credit = await Credit.find({}).sort({ date: -1 }).populate('userId', [
@@ -18,22 +18,25 @@ router.get('/', auth, async (req, res) => {
             'email',
         ]);
 
-        let userDetails = credit[0]
+        credit.forEach((data) => {
 
-        credit[0].transactions.forEach((data) => {
-            banks.push({
-                amount: data.amount,
-                status: data.status,
-                plan: data.plan,
-                id: data.id,
-                currency: data.currency,
-                transactionId: data.transactionId,
-                date: data.date,
-                userId: userDetails.id,
-                name: `${userDetails.userId.firstname} ${userDetails.userId.lastname}`,
-                email: userDetails.userId.email
+            data.transactions.forEach((val) => {
+
+                banks.push({
+                    amount: val.amount,
+                    status: val.status,
+                    plan: val.plan,
+                    id: val.id,
+                    currency: val.currency,
+                    transactionid: val.transactionId,
+                    date: val.date,
+                    userId: data.id,
+                    name: `${data.userId.firstname} ${data.userId.lastname}`,
+                    email: data.userId.email
+                })
 
             })
+
         })
 
         res.setHeader('Content-Range', 'bytes 0-10/100');

@@ -25,7 +25,63 @@ router.get('/', auth, async (req, res) => {
         console.log(err)
         res.status(500).json({ msg: 'Server Error' });
     }
-})
+});
+
+//@route  GET api/user/:id
+//@desc   Get account
+//access  Private
+router.get('/:id', auth, async (req, res) => {
+    let box = {};
+    try {
+        const credit = await User.findOne({ _id: req.params.id });
+
+        box.id = credit.id
+        box.firstname = credit.firstname
+        box.lastname = credit.lastname
+        box.access = credit.access
+
+        res.json(box)
+    } catch (err) {
+        res.status(500).json({ msg: 'Server Error' });
+    }
+});
+
+
+//@route  PUT api/credit
+//@desc   Edit account
+//access  Private
+router.put('/:id', auth, async (req, res) => {
+    const { access, firstname, lastname } = req.body;
+    let box = {};
+
+    const userAccount = {};
+
+    if (access) userAccount.access = access;
+    if (firstname) userAccount.firstname = firstname;
+    if (lastname) userAccount.lastname = lastname;
+
+    try {
+        let user = await User.findOne({ _id: req.params.id });
+
+        user = await User.findByIdAndUpdate(
+            user._id,
+            { $set: userAccount },
+            { new: true }
+        );
+
+        box.id = user.id
+        box.access = user.access
+        box.fistname = user.fistname
+        box.lastname = user.lastname
+
+        res.json(box);
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: 'Server Error' });
+    }
+});
+
 
 //@route  POST api/admin
 //@desc   Register admin

@@ -10,13 +10,14 @@ const Credit = require('../../models/Credit');
 //@desc   Get all user's credit
 //access  private
 router.get('/', auth, async (req, res) => {
-    const banks = [];
+    let banks = []
     try {
         const credit = await Credit.find({}).sort({ date: -1 }).populate('userId', [
             'firstname',
             'lastname',
             'email',
         ]);
+
         credit.forEach((data) => {
             banks.push({
                 userId: data.userId.id, id: data.id, name: `${data.userId.firstname} ${data.userId.lastname}`, email: data.userId.email, balance: data.balance, investment: data.investment, profit: data.profit, plan: data.plan, bitcoin: data.cryptos.bitcoin, ethereum: data.cryptos.ethereum,
@@ -105,7 +106,6 @@ router.put('/:id', auth, async (req, res) => {
         res.status(500).json({ msg: 'Server Error' });
     }
 });
-
 
 
 module.exports = router

@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
 app.use('/api/users', require('./routes/api/users'));
 app.use('/api/credit', require('./routes/api/credit'));
 app.use('/api/transactions', require('./routes/api/transactions'));
-// app.use('/api/wallet', require('./routes/api/wallet'));
+app.use('/api/wallet', require('./routes/api/wallet'));
 app.use('/api/auth', require('./routes/api/auth'));
 
 
